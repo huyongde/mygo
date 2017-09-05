@@ -3,6 +3,7 @@ package weixin
 import (
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -47,6 +48,9 @@ type ItemXml struct {
 	Url         string
 }
 
+func init() {
+	InitAppInfo()
+}
 func GenNewsXml() NewsXml {
 	var news_xml NewsXml
 	item := ItemXml{"Nginx Test", "Nginx 配置中的全局变量", "http://mmbiz.qpic.cn/mmbiz/pNv7yyl5J3jM6trKf8dL6BogFslUMGOQB2u7xGM3t8UDVAlBggJ6TeBGD1sWy7yk32EXqSSjpQwlMkq8rfe9ag/640?wx_fmt=jpeg&tp=webp&wxfrom=5", "http://mp.weixin.qq.com/s/_cxGX1JZnzwDS2kaaEBjHg"}
@@ -114,4 +118,28 @@ func getAccessToken() {
 	} else if err != nil {
 		Fatal.Fatalf("get accesstoken from redis error : %s ", err)
 	}
+}
+func GetIpList() {
+	url := "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=" + AccessToken
+	resp, err := http.Get(url)
+	if err != nil {
+		Fatal.Fatalf("http get ip list error: %s ", err)
+	}
+	if resp.Status != "200 OK" {
+		Fatal.Fatalf("http get ip list not ok : %s", resp.Status)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		Fatal.Fatalf("ip list read body err: %s ", err)
+	} else {
+		Trace.Printf("ip list response body: %s", string(body))
+		fmt.Println(string(body))
+	}
+	type IpList struct {
+		Ip_list []string `json:"ip_list"`
+	}
+	var data IpList
+	err = json.Unmarshal(body, &data)
+	fmt.Println(data.Ip_list)
+
 }

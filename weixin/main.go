@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	. "./log"
@@ -77,8 +78,9 @@ func dealweixin(w http.ResponseWriter, r *http.Request) {
 }
 func main() {
 
-	weixin.InitAppInfo()
 	fmt.Println(weixin.AccessToken)
+	weixin.GetIpList()
+	os.Exit(1)
 	Info.Println("ListenAndServe on 80 ")
 	http.HandleFunc("/weixin", dealweixin) //设置访问的路由
 	err := http.ListenAndServe(":80", nil) //设置监听的端口
