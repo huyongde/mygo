@@ -1,2 +1,3 @@
 *.exe
 *~
+/weixin/*.log
