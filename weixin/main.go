@@ -7,27 +7,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	. "./log"
 
 	"./weixin"
 )
-
-type TextXml struct {
-	XMLName      xml.Name `xml:"xml"`
-	ToUserName   string
-	FromUserName string
-	CreateTime   uint
-	MsgType      string
-	Content      string
-	/*
-		MsgId        string
-		MediaId      string
-		PicUrl       string
-	*/
-}
 
 func logInit(traceHandle io.Writer,
 	infoHandle io.Writer,
@@ -39,6 +24,9 @@ func logInit(traceHandle io.Writer,
 	Fatal = log.New(errorHandle, "Fatal: ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
+func helloworld(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("hello world"))
+}
 func dealweixin(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	fmt.Println(r.Form) //这些是服务器端的打印信息
@@ -49,21 +37,37 @@ func dealweixin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		Fatal.Fatal("Read xml data err", err)
 	}
-	var xml_o TextXml
+	var xml_o weixin.ComStruct
 	err = xml.Unmarshal(req_body, &xml_o)
 	if err != nil {
 		Fatal.Fatal("xml decode error", err)
 	}
+	var msgType = xml_o.MsgType
+	var res_xml interface{}
+	switch msgType {
+	case "text":
+		res_xml = new(weixin.TextXml)
+	case "image":
+		res_xml = new(weixin.ImgXml)
+	case "voice":
+		res_xml = new(weixin.VoiceXml)
+	case "video":
+		res_xml = new(weixin.VideoXml)
+	case "shortvideo":
+		res_xml = new(weixin.ShortVideoXml)
+	case "location":
+		res_xml = new(weixin.LocationXml)
+	case "link":
+		res_xml = new(weixin.LinkXml)
+	default:
+		fmt.Println(string(req_body))
+	}
+	err = xml.Unmarshal(req_body, res_xml)
+	fmt.Printf("%s : %+v \n ", msgType, res_xml)
+
 	xml_str := string(req_body)
-	Trace.Printf("receive body : %s", xml_str)
-	/*
-		xml_res := xml_o
-		xml_res.FromUserName = xml_o.ToUserName
-		xml_res.ToUserName = xml_o.FromUserName
-		xml_res.MsgType = "text"
-		xml_res.Content = "持续开发中 by golang "
-		res_body, err2 := xml.Marshal(xml_res)
-	*/
+	fmt.Printf("receive body : %s", xml_str)
+
 	news_xml := weixin.GenNewsXml()
 	news_xml.FromUserName = xml_o.ToUserName
 	news_xml.ToUserName = xml_o.FromUserName
@@ -79,10 +83,9 @@ func dealweixin(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	fmt.Println(weixin.AccessToken)
-	weixin.GetIpList()
-	os.Exit(1)
 	Info.Println("ListenAndServe on 80 ")
 	http.HandleFunc("/weixin", dealweixin) //设置访问的路由
+	http.HandleFunc("/", helloworld)       //设置访问的路由
 	err := http.ListenAndServe(":80", nil) //设置监听的端口
 	if err != nil {
 		Fatal.Fatal("ListenAndServe: ", err)

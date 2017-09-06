@@ -16,28 +16,51 @@ import (
 
 var Appid, AppSecret, AccessToken string
 
+type ComStruct struct {
+	XMLName      xml.Name `xml:"xml"`
+	ToUserName   string
+	FromUserName string
+	CreateTime   uint
+	MsgType      string
+	MsgId        int64
+}
 type TextXml struct {
-	XMLName      xml.Name `xml:"xml"`
-	ToUserName   string
-	FromUserName string
-	CreateTime   uint
-	MsgType      string
-	Content      string
-	/*
-		MsgId        string
-		MediaId      string
-		PicUrl       string
-	*/
+	ComStruct
+	Content string
 }
-type NewsXml struct {
-	XMLName      xml.Name `xml:"xml"`
-	ToUserName   string
-	FromUserName string
-	CreateTime   uint
-	MsgType      string
-	ArticleCount uint
-	Articles     ArticleXml
+type ImgXml struct {
+	ComStruct
+	PicUrl  string
+	MediaId string
 }
+type VoiceXml struct {
+	ComStruct
+	MediaId     string
+	Format      string
+	Recognition string
+}
+type VideoXml struct {
+	ComStruct
+	MediaId      string
+	ThumbMediaId string
+}
+type ShortVideoXml struct {
+	VideoXml
+}
+type LocationXml struct {
+	ComStruct
+	Location_X string
+	Location_Y string
+	Scale      int
+	Label      string
+}
+type LinkXml struct {
+	ComStruct
+	Title       string
+	Description string
+	Url         string
+}
+
 type ArticleXml struct {
 	Item []ItemXml `xml:"item"`
 }
@@ -46,6 +69,11 @@ type ItemXml struct {
 	Description string
 	PicUrl      string
 	Url         string
+}
+type NewsXml struct {
+	ComStruct
+	ArticleCount uint
+	Articles     ArticleXml
 }
 
 func init() {
