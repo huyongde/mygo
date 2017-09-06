@@ -116,7 +116,7 @@ func InitAppInfo() {
 func getAccessToken() {
 	var err error
 	AccessToken, err = RedisClient.Get("accesstoken").Result()
-	if err == redis.Nil {
+	if err == redis.Nil || AccessToken == "" {
 		Trace.Printf("start get access token from weixin ")
 		url := "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + Appid + "&secret=" + AppSecret
 		resp, errHttp := http.Get(url)
@@ -136,7 +136,7 @@ func getAccessToken() {
 		}
 		type ResToken struct {
 			Access_token string `json:"access_token"`
-			Expire_inf   uint   `json:"expire_in"`
+			Expire_in    uint   `json:"expire_in"`
 		}
 		var data ResToken
 		err = json.Unmarshal(body, &data)

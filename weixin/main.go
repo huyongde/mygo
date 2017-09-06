@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 
 	. "./log"
 
@@ -28,11 +27,14 @@ func helloworld(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("hello world"))
 }
 func dealweixin(w http.ResponseWriter, r *http.Request) {
+	/* // token验证用
 	r.ParseForm()
 	fmt.Println(r.Form) //这些是服务器端的打印信息
 	echostr := strings.Join(r.Form["echostr"], "")
 	fmt.Println(echostr)
 	fmt.Fprintf(w, echostr) //输出到客户端的信息
+	return
+	*/
 	req_body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		Fatal.Fatal("Read xml data err", err)
@@ -100,6 +102,10 @@ func dealweixin(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	fmt.Println(weixin.AccessToken)
+	//weixin.GetUserList()
+	//weixin.SetUserMark("oZ4Wjw9tqYXW811vx6K73bH6Xy0s", "媳妇")
+	weixin.GetMenu()
+	return
 	Info.Println("ListenAndServe on 80 ")
 	http.HandleFunc("/weixin", dealweixin) //设置访问的路由
 	http.HandleFunc("/", helloworld)       //设置访问的路由
