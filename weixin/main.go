@@ -72,6 +72,7 @@ func dealweixin(w http.ResponseWriter, r *http.Request) {
 	news_xml.FromUserName = xml_o.ToUserName
 	news_xml.ToUserName = xml_o.FromUserName
 	news_xml.CreateTime = xml_o.CreateTime
+	news_xml.Articles.Item[0].Title = msgType + "消息已收到"
 
 	res_body, err2 := xml.Marshal(news_xml)
 	if err2 != nil {
