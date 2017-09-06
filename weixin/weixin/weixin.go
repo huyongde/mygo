@@ -75,6 +75,10 @@ type NewsXml struct {
 	ArticleCount uint
 	Articles     ArticleXml
 }
+type EventXml struct {
+	ComStruct
+	Event string
+}
 
 func init() {
 	InitAppInfo()
