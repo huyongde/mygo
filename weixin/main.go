@@ -81,10 +81,10 @@ func dealweixin(w http.ResponseWriter, r *http.Request) {
 		news_xml.CreateTime = xml_o.CreateTime
 		res_body, err2 = xml.Marshal(news_xml)
 	} else {
-		//news_xml := weixin.GenNewsXml()
-		news_xml := new(weixin.TextXml)
-		news_xml.Content = msgType + "消息已收到"
-		news_xml.MsgType = "text"
+		news_xml := weixin.GenNewsXml(msgType)
+		//news_xml := new(weixin.TextXml)
+		//news_xml.Content = msgType + "消息已收到， 请查看历史消息"
+		//news_xml.MsgType = "text"
 		news_xml.FromUserName = xml_o.ToUserName
 		news_xml.ToUserName = xml_o.FromUserName
 		news_xml.CreateTime = xml_o.CreateTime

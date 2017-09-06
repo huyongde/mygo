@@ -83,9 +83,12 @@ type EventXml struct {
 func init() {
 	InitAppInfo()
 }
-func GenNewsXml() NewsXml {
+func GenNewsXml(msgType string) NewsXml {
 	var news_xml NewsXml
-	item := ItemXml{"Nginx Test", "Nginx 配置中的全局变量", "http://mmbiz.qpic.cn/mmbiz/pNv7yyl5J3jM6trKf8dL6BogFslUMGOQB2u7xGM3t8UDVAlBggJ6TeBGD1sWy7yk32EXqSSjpQwlMkq8rfe9ag/640?wx_fmt=jpeg&tp=webp&wxfrom=5", "http://mp.weixin.qq.com/s/_cxGX1JZnzwDS2kaaEBjHg"}
+	item := ItemXml{msgType + " 消息收到",
+		"请点击查看公众号历史消息",
+		"",
+		"https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAxNTU2NzAxNQ==&scene=123#wechat_redirect"}
 	var article_xml ArticleXml
 	article_xml.Item = []ItemXml{item}
 	news_xml.Articles = article_xml

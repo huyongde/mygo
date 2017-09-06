@@ -2,3 +2,4 @@
 *~
 /weixin/*.log
 /weixin/main
+/weixin/nohup.out
