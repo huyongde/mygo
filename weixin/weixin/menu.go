@@ -8,6 +8,6 @@ func GetMenu() {
 	fmt.Println(string(body))
 }
 func SetMenu() {
-	url := "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + AccessToken
+	//	url := "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + AccessToken
 
 }

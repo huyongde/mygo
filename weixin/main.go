@@ -99,17 +99,21 @@ func dealweixin(w http.ResponseWriter, r *http.Request) {
 	w.Write(res_body)
 	Trace.Printf("response body: %s \n", string(res_body))
 }
+func StaticServer(w http.ResponseWriter, r *http.Request) {
+	http.FileServer(http.Dir("/home/ubuntu/golang/mygo/weixin/")).ServeHTTP(w, r)
+}
 func main() {
 
 	fmt.Println(weixin.AccessToken)
 	//weixin.GetUserList()
 	//weixin.SetUserMark("oZ4Wjw9tqYXW811vx6K73bH6Xy0s", "媳妇")
-	weixin.GetMenu()
-	return
+	//weixin.GetMenu()
+	//return
 	Info.Println("ListenAndServe on 80 ")
-	http.HandleFunc("/weixin", dealweixin) //设置访问的路由
-	http.HandleFunc("/", helloworld)       //设置访问的路由
-	err := http.ListenAndServe(":80", nil) //设置监听的端口
+	http.HandleFunc("/weixin", dealweixin)                                             //设置访问的路由
+	http.HandleFunc("/hello", helloworld)                                              //设置访问的路由
+	http.Handle("/h5/", http.FileServer(http.Dir("/home/ubuntu/golang/mygo/weixin/"))) //设置访问的路由
+	err := http.ListenAndServe(":80", nil)                                             //设置监听的端口
 	if err != nil {
 		Fatal.Fatal("ListenAndServe: ", err)
 	}
