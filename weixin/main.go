@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	. "./log"
 
@@ -42,7 +43,7 @@ func dealweixin(w http.ResponseWriter, r *http.Request) {
 	var xml_o weixin.ComStruct
 	err = xml.Unmarshal(req_body, &xml_o)
 	if err != nil {
-		Fatal.Fatal("xml decode error", err)
+		Fatal.Println("xml decode error", err)
 	}
 	var msgType = xml_o.MsgType
 	var res_xml interface{}
@@ -113,7 +114,14 @@ func main() {
 	http.HandleFunc("/weixin", dealweixin)                                             //设置访问的路由
 	http.HandleFunc("/hello", helloworld)                                              //设置访问的路由
 	http.Handle("/h5/", http.FileServer(http.Dir("/home/ubuntu/golang/mygo/weixin/"))) //设置访问的路由
-	err := http.ListenAndServe(":80", nil)                                             //设置监听的端口
+
+	srv := http.Server{}
+	srv.ReadTimeout = 5 * time.Second
+	srv.WriteTimeout = 5 * time.Second
+	srv.Addr = ":80"
+
+	//err := http.ListenAndServe(":80", nil)                                             //设置监听的端口
+	err := srv.ListenAndServe()
 	if err != nil {
 		Fatal.Fatal("ListenAndServe: ", err)
 	}
