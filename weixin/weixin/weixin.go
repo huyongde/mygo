@@ -104,12 +104,12 @@ func InitAppInfo() {
 	var errRedis error
 	Appid, errRedis = RedisClient.Get(key).Result()
 	if errRedis != nil {
-		Fatal.Fatalf("get key :%s error: %s ", key, errRedis)
+		Fatal.Printf("get key :%s error: %s ", key, errRedis)
 	}
 	key = "appsecret"
 	AppSecret, errRedis = RedisClient.Get(key).Result()
 	if errRedis != nil {
-		Fatal.Fatalf("get key :%s error: %s ", key, errRedis)
+		Fatal.Printf("get key :%s error: %s ", key, errRedis)
 	}
 	getAccessToken()
 }
@@ -121,16 +121,16 @@ func getAccessToken() {
 		url := "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + Appid + "&secret=" + AppSecret
 		resp, errHttp := http.Get(url)
 		if errHttp != nil {
-			Fatal.Fatalf("http get access token err: %s ", errHttp)
+			Fatal.Printf("http get access token err: %s ", errHttp)
 		}
 
 		status := resp.Status
 		if status != "200 OK" {
-			Fatal.Fatalf("http get access status not ok : %s", status)
+			Fatal.Printf("http get access status not ok : %s", status)
 		}
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			Fatal.Fatalf("read body err: %s ", err)
+			Fatal.Printf("read body err: %s ", err)
 		} else {
 			Trace.Printf("response body: %s", string(body))
 		}
@@ -141,31 +141,31 @@ func getAccessToken() {
 		var data ResToken
 		err = json.Unmarshal(body, &data)
 		if err != nil {
-			Fatal.Fatalf("decode json body err: %s ", err)
+			Fatal.Printf("decode json body err: %s ", err)
 		}
 		AccessToken = data.Access_token
 		err = RedisClient.SetNX("accesstoken", AccessToken, 7200*time.Second).Err()
 		if err != nil {
-			Fatal.Fatalf("set redis access token err: %s ", err)
+			Fatal.Printf("set redis access token err: %s ", err)
 		}
 		Trace.Printf("http get access token end, accesstoken: %s", AccessToken)
 
 	} else if err != nil {
-		Fatal.Fatalf("get accesstoken from redis error : %s ", err)
+		Fatal.Printf("get accesstoken from redis error : %s ", err)
 	}
 }
 func GetIpList() {
 	url := "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=" + AccessToken
 	resp, err := http.Get(url)
 	if err != nil {
-		Fatal.Fatalf("http get ip list error: %s ", err)
+		Fatal.Printf("http get ip list error: %s ", err)
 	}
 	if resp.Status != "200 OK" {
-		Fatal.Fatalf("http get ip list not ok : %s", resp.Status)
+		Fatal.Printf("http get ip list not ok : %s", resp.Status)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		Fatal.Fatalf("ip list read body err: %s ", err)
+		Fatal.Printf("ip list read body err: %s ", err)
 	} else {
 		Trace.Printf("ip list response body: %s", string(body))
 		fmt.Println(string(body))
