@@ -1,6 +1,7 @@
 package gotest
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -34,6 +35,10 @@ func Test_ClientTimeout(t *testing.T) {
 
 	t.Log("测试客户端的超时设置")
 }
+
+/*
+通过 Request.Cancel 来设置超时
+*/
 func Test_ClientTimeout2(t *testing.T) {
 	c := make(chan struct{})
 	timer := time.AfterFunc(1*time.Second, func() { // 1秒后关闭c
@@ -58,7 +63,7 @@ func Test_ClientTimeout2(t *testing.T) {
 
 	fmt.Println("start read body")
 	for {
-		timer.Reset(50 * time.Millisecond)
+		timer.Reset(1 * time.Second)
 		_, err = io.CopyN(ioutil.Discard, resp.Body, 256)
 		if err == io.EOF {
 			break
@@ -70,6 +75,22 @@ func Test_ClientTimeout2(t *testing.T) {
 	t.Log("测试客户端的超时设置2")
 }
 
+/*
+通过request 的withContext 来设置客户端超时
+*/
+
 func Test_ClientTimeout3(t *testing.T) {
-	ctx, cancel := context
+	ctx, cancel := context.WithCancel(context.TODO())
+	time.AfterFunc(1*time.Second, func() {
+		fmt.Println("context cancel")
+		cancel()
+	})
+	req, err := http.NewRequest("GET", "http://httpbin.org/range/2048?duration=8&chunk_size=256", nil)
+	if err != nil {
+		fmt.Println("new request error ")
+		os.Exit(1)
+	}
+	req = req.WithContext(ctx)
+	resp, err := http.DefaultClient.Do(req)
+	fmt.Println(resp, err)
 }
